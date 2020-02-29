@@ -1,6 +1,7 @@
 #include "stdio.h"
-#include "string.h"
-#include "math.h"
+#include "environment.h"
+#include "stdlib.h"
+
 
 static struct
 {
@@ -9,7 +10,6 @@ static struct
     int numOfGoldClusters;
     int numOfObstacles;
 }envParams;
-
 
 void inputReader();
 
@@ -50,7 +50,7 @@ void inputReader()
         }
         else
         {
-            printf("Unknown Object type in env.inp");
+            printf("Unknown Object type in env.inp \n");
         }
         
     }
@@ -60,6 +60,18 @@ void inputReader()
 
 int main()
 {
-    inputReader();
+    int a;
+    printf("xy\n");
+    createGridWorld(10);
+
+    a = getClusterNum(3,4);
+    printf("a: %d \n",a);
+
+    setClusterNum(3,4,8);
+    a = getClusterNum(3,4);
+    printf("a: %d \n",a);
+
+    printCurrGrid();
+
     return 0;
 }
