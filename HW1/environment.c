@@ -19,22 +19,11 @@ void createGridWorld(int n)
     {
         for(j = 0; j < n; j++)
         {
-            gridWorld[i][j].clusterNum = 0;
             gridWorld[i][j].goldNum = 0;
             gridWorld[i][j].isRobotCarryGold = 0;
             gridWorld[i][j].occupation = 0;
         }
     }
-}
-
-int getClusterNum(int x, int y)
-{
-    return gridWorld[x][y].clusterNum;
-}
-
-void setClusterNum(int x, int y, int val)
-{
-    gridWorld[x][y].clusterNum = val;
 }
 
 int getGoldNum(int x, int y)
@@ -67,13 +56,23 @@ void setOccupation(int x, int y, int val)
     gridWorld[x][y].occupation = val;
 }
 
+int getRobotID(int x, int y)
+{
+    return gridWorld[x][y].robotID;
+}
+
+void setRobotID(int x, int y, int val)
+{
+    gridWorld[x][y].robotID = val;
+}
+
 void printCurrGrid()
 {
     int x,y;
 
-    for ( x = 0; x < gridLen; x++)
+    for ( y = 0; y < gridLen; y++)
     {
-        for ( y = 0; y < gridLen; y++)
+        for ( x = 0; x < gridLen; x++)
         {
             if(gridWorld[x][y].occupation == OCCUPATION_NONE)
             {
@@ -103,7 +102,7 @@ void printCurrGrid()
                 {
                     printf("r");
                 }
-                // TODO: add robot id
+                printf("%d ",gridWorld[x][y].robotID);
                 
             }
             

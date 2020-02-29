@@ -1,3 +1,6 @@
+#ifndef ENVIRONMENT_H 
+#define ENVIRONMENT_H 
+
 #define OCCUPATION_NONE     0
 #define OCCUPATION_DEPOT    1
 #define OCCUPATION_GOLD     2
@@ -9,16 +12,20 @@ typedef struct GridCells
     int occupation;    // Can be 'D', 'G', 'O', 'R', 'r', or 'x' (empty)
     int goldNum;    // valid if occupation == 'D' or 'G'
     int isRobotCarryGold;   // valid if occupation == 'r'
-    int clusterNum;
+    int robotID;     // valid if occupation == 'r'
 }GridCell;
 
-void createGridWorld(int n);
-int getClusterNum(int x, int y);
-void setClusterNum(int x, int y, int cNum);
-int getGoldNum(int x, int y);
-void setGoldNum(int x, int y, int val);
-int getIsRobotCarryGold(int x, int y);
-void setIsRobotCarryGold(int x, int y, int val);
-int getOccupation(int x, int y);
-void setOccupation(int x, int y, int val);
-void printCurrGrid();
+void    createGridWorld(int n);
+int     getClusterNum(int x, int y);
+void    setClusterNum(int x, int y, int cNum);
+int     getGoldNum(int x, int y);
+void    setGoldNum(int x, int y, int val);
+int     getIsRobotCarryGold(int x, int y);
+void    setIsRobotCarryGold(int x, int y, int val);
+int     getOccupation(int x, int y);
+void    setOccupation(int x, int y, int val);
+void    printCurrGrid();
+int     getRobotID(int x, int y);
+void    setRobotID(int x, int y, int val);
+
+#endif
