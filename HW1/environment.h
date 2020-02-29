@@ -13,11 +13,10 @@ typedef struct GridCells
     int goldNum;    // valid if occupation == 'D' or 'G'
     int isRobotCarryGold;   // valid if occupation == 'r'
     int robotID;     // valid if occupation == 'r'
+    float distanceToDepot;    // Simulating depot signal in the book
 }GridCell;
 
 void    createGridWorld(int n);
-int     getClusterNum(int x, int y);
-void    setClusterNum(int x, int y, int cNum);
 int     getGoldNum(int x, int y);
 void    setGoldNum(int x, int y, int val);
 int     getIsRobotCarryGold(int x, int y);
@@ -27,5 +26,10 @@ void    setOccupation(int x, int y, int val);
 void    printCurrGrid();
 int     getRobotID(int x, int y);
 void    setRobotID(int x, int y, int val);
+int     getTerminateSignal();
+void    addToTotalGolds(int val);
+void    calculateSignalStr();
+int     getGridLen();
+float   getSignalStr(int x, int y);
 
 #endif

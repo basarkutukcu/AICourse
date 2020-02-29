@@ -25,7 +25,6 @@ void inputReader()
     fscanf(fp,"%d\n",&envParams.numOfRobots);
     spawnRobots(envParams.numOfRobots);
     fscanf(fp,"%d\n",&envParams.numOfGoldClusters);
-    setTotalGolds(envParams.numOfGoldClusters);
     fscanf(fp,"%d\n",&envParams.numOfObstacles);
 
     robotID = 0;
@@ -47,6 +46,7 @@ void inputReader()
             fscanf(fp,"%d\n",&numOfGolds);
             setOccupation(coordX,coordY,OCCUPATION_GOLD);
             setGoldNum(coordX,coordY,numOfGolds);
+            addToTotalGolds(numOfGolds);
         }
         else if(objType == 'o')
         {
@@ -76,18 +76,19 @@ int main()
     int simStep;
     int i;
     inputReader();
+    calculateSignalStr();
     printCurrGrid();
 
     simStep = 0;
-    while(getTotalGolds() != 0 && simStep < 100)
+    while(getTerminateSignal() == 0 && simStep < 500)
     {
-        printf("sim step: %d ", simStep);
+        printf("sim step: %d \n", simStep);
         for(i = 0; i < envParams.numOfRobots; i++)
         {
             act(i);
         }
-        printf("\n\n");
         printCurrGrid();
+        printf("\n\n");
         simStep++;
     }
 
