@@ -47,7 +47,8 @@ void pickUpGold(int x,int y,int id)
     goldNum--;
     if(goldNum == 0)
     {
-        setOccupation(x,y,OCCUPATION_NONE);
+        setOccupation(x,y,OCCUPATION_ROBOT);
+        setIsRobotCarryGold(x,y,1);
     }
     else
     {

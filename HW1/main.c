@@ -37,6 +37,8 @@ void inputReader()
         {
             fscanf(fp,"%d ",&coordX);
             fscanf(fp,"%d\n",&coordY);
+            coordX--;
+            coordY--;
             putRobotOnMap(coordX, coordY, robotID);
             robotID++;// Use these to spawn robots
         }
@@ -45,6 +47,8 @@ void inputReader()
             fscanf(fp,"%d ",&coordX);
             fscanf(fp,"%d ",&coordY);
             fscanf(fp,"%d\n",&numOfGolds);
+            coordX--;
+            coordY--;
             setOccupation(coordX,coordY,OCCUPATION_GOLD);
             setGoldNum(coordX,coordY,numOfGolds);
             addToTotalGolds(numOfGolds);
@@ -53,12 +57,16 @@ void inputReader()
         {
             fscanf(fp,"%d ",&coordX);
             fscanf(fp,"%d\n",&coordY);
+            coordX--;
+            coordY--;
             setOccupation(coordX,coordY,OCCUPATION_OBSTACLE);
         }
         else if(objType == 'd')
         {
             fscanf(fp,"%d ",&coordX);
             fscanf(fp,"%d\n",&coordY);
+            coordX--;
+            coordY--;
             setOccupation(coordX,coordY,OCCUPATION_DEPOT);
             setGoldNum(coordX,coordY,0);
         }
