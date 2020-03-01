@@ -122,7 +122,6 @@ void calculateSignalStr()
         }
         
     }
-    
 }
 
 float getSignalStr(int x, int y)
@@ -169,12 +168,8 @@ void printCurrGrid()
                     printf("r");
                 }
                 printf("%d ",gridWorld[x][y].robotID);
-                
             }
         }
         printf("\n");
     }
 }
-
-
-

@@ -3,17 +3,13 @@
 #include "stdio.h"
 #include "robot.h"
 
-#define MAX_RANDOM_MOVE 4
-
 Robot* robots;
 int totalRobotNum;
-int randomMoveNum;
 
 void spawnRobots(int n)
 {
     int i, j;
     robots = (Robot*)malloc(n * sizeof(Robot*));
-    randomMoveNum = 0;  // init
     totalRobotNum = n;
 
     for(i = 0; i < n; i++)
@@ -379,16 +375,7 @@ void act(int id)
     
     else if(isCarryGold == 0)   // Wander
     {
-        if(randomMoveNum < MAX_RANDOM_MOVE)
-        {
-            validCoords = findValidRandom(currX, currY);
-            randomMoveNum++;
-        }
-        else
-        {
-            validCoords = findValidMinMax(currX, currY, SEARCH_MAX);
-            randomMoveNum = 0;
-        }
+        validCoords = findValidRandom(currX, currY);
         move(validCoords.x,validCoords.y,id);
     }
     else
