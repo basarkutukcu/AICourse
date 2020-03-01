@@ -14,6 +14,7 @@ typedef struct GridCells
     int isRobotCarryGold;   // valid if occupation == 'r'
     int robotID;     // valid if occupation == 'r'
     float distanceToDepot;    // Simulating depot signal in the book
+    int crumbNum;
 }GridCell;
 
 void    createGridWorld(int n);
@@ -31,5 +32,7 @@ void    addToTotalGolds(int val);
 void    calculateSignalStr();
 int     getGridLen();
 float   getSignalStr(int x, int y);
+int     getcrumbNum(int x, int y);
+void    setcrumbNum(int x, int y, int val);
 
 #endif

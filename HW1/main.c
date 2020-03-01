@@ -2,6 +2,7 @@
 #include "environment.h"
 #include "stdlib.h"
 #include "robot.h"
+#include "time.h"
 
 
 static struct
@@ -78,6 +79,7 @@ int main()
     inputReader();
     calculateSignalStr();
     printCurrGrid();
+    srand(time(0));
 
     simStep = 0;
     while(getTerminateSignal() == 0 && simStep < 500)

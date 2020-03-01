@@ -31,6 +31,7 @@ void createGridWorld(int n)
             gridWorld[i][j].goldNum = 0;
             gridWorld[i][j].isRobotCarryGold = 0;
             gridWorld[i][j].occupation = 0;
+            gridWorld[i][j].crumbNum = 0;
         }
     }
 }
@@ -83,6 +84,16 @@ int getRobotID(int x, int y)
 void setRobotID(int x, int y, int val)
 {
     gridWorld[x][y].robotID = val;
+}
+
+int getcrumbNum(int x, int y)
+{
+    return gridWorld[x][y].crumbNum;
+}
+
+void setcrumbNum(int x, int y, int val)
+{
+    gridWorld[x][y].crumbNum = val;
 }
 
 void setTerminateSignal()

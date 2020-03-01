@@ -3,12 +3,16 @@
 #include "stdio.h"
 #include "robot.h"
 
+#define MAX_RANDOM_MOVE 4
+
 Robot* robots;
+int randomMoveNum;
 
 void spawnRobots(int n)
 {
     int i, j;
     robots = (Robot*)malloc(n * sizeof(Robot*));
+    randomMoveNum = 0;  // init
 
     for(i = 0; i < n; i++)
     {
@@ -72,6 +76,7 @@ void move(int dirX, int dirY, int id)
     robots[id].x = robots[id].x + dirX;
     robots[id].y = robots[id].y + dirY;
     setIsRobotCarryGold(robots[id].x, robots[id].y, robots[id].isCarryGold);
+    setRobotID(robots[id].x, robots[id].y, id);
     if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_NONE)
         setOccupation(robots[id].x, robots[id].y, OCCUPATION_ROBOT);
 }
@@ -160,35 +165,155 @@ coords findValidMinMax(int curX, int curY, int type)
     return validSrcCoords;
 }
 
+void leaveCrumbs(int x, int y)
+{
+    int crNum;
+    crNum = getcrumbNum(x,y);
+    crNum = crNum + 2;
+    setcrumbNum(x,y,crNum);
+}
 
+void takeCrumbs(int x, int y)
+{
+    int crNum;
+    crNum = getcrumbNum(x,y);
+    crNum = crNum - 1;
+    setcrumbNum(x,y,crNum);
+}
+
+void followCrumbs(int curX, int curY, int id)
+{
+    int x, y;
+    int crumbX = 0, crumbY = 0;
+    int tempX, tempY;
+    float maxSignal = 0;
+    int isValid;
+
+    for ( x = -1; x < 2; x++)
+    {
+        for ( y = -1; y < 2; y++)
+        {
+            if(x == 0 && y == 0)    // don't check current cell
+                break;
+
+            tempX = curX + x;
+            tempY = curY + y;
+            if(getcrumbNum(tempX, tempY) > 0)   // Neighboring crumb found
+            {
+                if(getSignalStr(tempX, tempY) > maxSignal)
+                {
+                    crumbX = x;
+                    crumbY = y;
+                    maxSignal = getSignalStr(tempX, tempY);
+                }
+            }
+        }
+    }
+
+    isValid = validCoord(curX + crumbX, curY + crumbY);
+    if(isValid)
+        move(crumbX, crumbY , id);
+    
+}
+
+int senseGold(int curX, int curY)
+{
+    int x, y;
+
+    for ( x = -1; x < 2; x++)
+    {
+        for ( y = -1; y < 2; y++)
+        {
+            if(validCoord(curX + x, curY + y) == 1)
+            {
+                if(getOccupation(curX+x,curY+y) == OCCUPATION_GOLD)
+                {
+                    return 1;
+                }
+            }
+            
+        }
+    }
+    return 0;
+}
+
+coords senseGoldCoords(int curX, int curY)
+{
+    int x, y;
+    coords goldCoords;
+    goldCoords.x = 0;
+    goldCoords.y = 0;
+    for ( x = -1; x < 2; x++)
+    {
+        for ( y = -1; y < 2; y++)
+        {
+            if(validCoord(curX + x, curY + y) == 1)
+            {
+                if(getOccupation(curX+x,curY+y) == OCCUPATION_GOLD)
+                {
+                    goldCoords.x = x;
+                    goldCoords.y = y;
+                }
+            }
+            
+        }
+    }
+    return goldCoords;
+}
 
 void act(int id)
 {
     int currX, currY, currOcc, isCarryGold;
     coords validCoords;
+    coords goldCoords;
 
     currX = robots[id].x;
     currY = robots[id].y;
     currOcc = getOccupation(currX, currY);
     isCarryGold = robots[id].isCarryGold;
 
-    if(isCarryGold == 1 && currOcc == OCCUPATION_DEPOT)
+    if(isCarryGold == 1 && currOcc == OCCUPATION_DEPOT) // Drop Gold
     {
         putDownGold(currX, currY, id);
     }
-    else if(isCarryGold == 0 && currOcc == OCCUPATION_GOLD)
+    else if(isCarryGold == 1)   // Follow Gradient to Depot
+    {
+        validCoords = findValidMinMax(currX, currY, SEARCH_MIN);
+        leaveCrumbs(currX,currY);
+        move(validCoords.x,validCoords.y,id);
+    }
+    else if(isCarryGold == 0 && currOcc == OCCUPATION_GOLD) // Pick Gold
     {
         pickUpGold(currX, currY, id);
     }
-    else if(isCarryGold == 1)
+    else if(isCarryGold == 0 && senseGold(currX, currY) == 1)   // Go into neighbor gold cluster
     {
-        validCoords = findValidMinMax(currX, currY, SEARCH_MIN);
+        goldCoords = senseGoldCoords(currX,currY);
+        move(goldCoords.x, goldCoords.y, id);
+    }
+    else if (isCarryGold == 0 && getcrumbNum(currX, currY) > 0) // Follow crumbs to Gold Cluster
+    {
+        takeCrumbs(currX, currY);
+        followCrumbs(currX, currY, id);
+    }
+    
+    else if(isCarryGold == 0)   // Wander
+    {
+        if(randomMoveNum < MAX_RANDOM_MOVE)
+        {
+            validCoords = findValidRandom(currX, currY);
+            randomMoveNum++;
+        }
+        else
+        {
+            validCoords = findValidMinMax(currX, currY, SEARCH_MAX);
+            randomMoveNum = 0;
+        }
         move(validCoords.x,validCoords.y,id);
     }
-    else if(isCarryGold == 0)
+    else
     {
-        validCoords = findValidRandom(currX, currY);
-        printf("valids x: %d, y: %d \n", validCoords.x,validCoords.y);
-        move(validCoords.x,validCoords.y,id);
+        // Do nothing
     }
+    
 }
