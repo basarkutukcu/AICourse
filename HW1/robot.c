@@ -71,13 +71,24 @@ void move(int dirX, int dirY, int id)
 {
     if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_ROBOT)   // Robot cannot overwrite D/G
         setOccupation(robots[id].x, robots[id].y, OCCUPATION_NONE);
-    
+    else if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_DEPOT_WITH_ROBOT)
+        setOccupation(robots[id].x, robots[id].y, OCCUPATION_DEPOT);
+    else if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_GOLD_WITH_ROBOT)
+        setOccupation(robots[id].x, robots[id].y, OCCUPATION_GOLD);
+
+
     robots[id].x = robots[id].x + dirX;
     robots[id].y = robots[id].y + dirY;
     setIsRobotCarryGold(robots[id].x, robots[id].y, robots[id].isCarryGold);
     setRobotID(robots[id].x, robots[id].y, id);
+
+
     if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_NONE)
         setOccupation(robots[id].x, robots[id].y, OCCUPATION_ROBOT);
+    else if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_DEPOT)
+        setOccupation(robots[id].x, robots[id].y, OCCUPATION_DEPOT_WITH_ROBOT);
+    else if(getOccupation(robots[id].x, robots[id].y) == OCCUPATION_GOLD)
+        setOccupation(robots[id].x, robots[id].y, OCCUPATION_GOLD_WITH_ROBOT);
 }
 
 int validCoord(int x, int y)
@@ -344,7 +355,7 @@ void act(int id)
     currOcc = getOccupation(currX, currY);
     isCarryGold = robots[id].isCarryGold;
 
-    if(isCarryGold == 1 && currOcc == OCCUPATION_DEPOT) // Drop Gold
+    if(isCarryGold == 1 && currOcc == OCCUPATION_DEPOT_WITH_ROBOT) // Drop Gold
     {
         putDownGold(currX, currY, id);
     }
@@ -358,7 +369,7 @@ void act(int id)
         leaveCrumbs(currX,currY);
         move(validCoords.x,validCoords.y,id);
     }
-    else if(isCarryGold == 0 && currOcc == OCCUPATION_GOLD) // Pick Gold
+    else if(isCarryGold == 0 && currOcc == OCCUPATION_GOLD_WITH_ROBOT) // Pick Gold
     {
         pickUpGold(currX, currY, id);
     }

@@ -141,14 +141,14 @@ void printCurrGrid()
             {
                 printf("x  ");
             }
-            else if (gridWorld[x][y].occupation == OCCUPATION_DEPOT)
+            else if (gridWorld[x][y].occupation == OCCUPATION_DEPOT || gridWorld[x][y].occupation == OCCUPATION_DEPOT_WITH_ROBOT)
             {
                 printf("D");
                 printf("%d ",gridWorld[x][y].goldNum);
                 if(totalGolds == gridWorld[x][y].goldNum)
                     setTerminateSignal();
             }
-            else if (gridWorld[x][y].occupation == OCCUPATION_GOLD)
+            else if (gridWorld[x][y].occupation == OCCUPATION_GOLD || gridWorld[x][y].occupation == OCCUPATION_GOLD_WITH_ROBOT)
             {
                 printf("G");
                 printf("%d ",gridWorld[x][y].goldNum);

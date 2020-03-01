@@ -1,11 +1,13 @@
 #ifndef ENVIRONMENT_H 
 #define ENVIRONMENT_H 
 
-#define OCCUPATION_NONE     0
-#define OCCUPATION_DEPOT    1
-#define OCCUPATION_GOLD     2
-#define OCCUPATION_OBSTACLE 3
-#define OCCUPATION_ROBOT    4
+#define OCCUPATION_NONE             0
+#define OCCUPATION_DEPOT            1
+#define OCCUPATION_GOLD             2
+#define OCCUPATION_OBSTACLE         3
+#define OCCUPATION_ROBOT            4
+#define OCCUPATION_DEPOT_WITH_ROBOT 5
+#define OCCUPATION_GOLD_WITH_ROBOT  6
 
 typedef struct GridCells
 {
