@@ -193,18 +193,21 @@ void followCrumbs(int curX, int curY, int id)
     {
         for ( y = -1; y < 2; y++)
         {
-            if(x == 0 && y == 0)    // don't check current cell
-                break;
-
-            tempX = curX + x;
-            tempY = curY + y;
-            if(getcrumbNum(tempX, tempY) > 0)   // Neighboring crumb found
+            if(validCoord(curX + x, curY + y) == 1)
             {
-                if(getSignalStr(tempX, tempY) > maxSignal)
+                if(x == 0 && y == 0)    // don't check current cell
+                    break;
+
+                tempX = curX + x;
+                tempY = curY + y;
+                if(getcrumbNum(tempX, tempY) > 0)   // Neighboring crumb found
                 {
-                    crumbX = x;
-                    crumbY = y;
-                    maxSignal = getSignalStr(tempX, tempY);
+                    if(getSignalStr(tempX, tempY) > maxSignal)
+                    {
+                        crumbX = x;
+                        crumbY = y;
+                        maxSignal = getSignalStr(tempX, tempY);
+                    }
                 }
             }
         }
@@ -267,6 +270,7 @@ void act(int id)
     coords validCoords;
     coords goldCoords;
 
+    printf("id : %d \n",id);
     currX = robots[id].x;
     currY = robots[id].y;
     currOcc = getOccupation(currX, currY);
