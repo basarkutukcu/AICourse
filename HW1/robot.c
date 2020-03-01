@@ -6,6 +6,7 @@
 #define MAX_RANDOM_MOVE 4
 
 Robot* robots;
+int totalRobotNum;
 int randomMoveNum;
 
 void spawnRobots(int n)
@@ -13,6 +14,7 @@ void spawnRobots(int n)
     int i, j;
     robots = (Robot*)malloc(n * sizeof(Robot*));
     randomMoveNum = 0;  // init
+    totalRobotNum = n;
 
     for(i = 0; i < n; i++)
     {
@@ -91,6 +93,26 @@ int validCoord(int x, int y)
 
     occ = getOccupation(x,y);
     if(occ == OCCUPATION_NONE || occ == OCCUPATION_DEPOT || occ == OCCUPATION_GOLD)
+    {
+        return 1;
+    }
+    else
+    {
+        return 0;
+    }
+    
+}
+
+int validCoordForPass(int x, int y)
+{
+    int occ, gridLen;
+
+    gridLen = getGridLen();
+    if(x > gridLen-1 || y > gridLen-1 || x<0 || y<0)
+        return 0;
+
+    occ = getOccupation(x,y);
+    if(occ == OCCUPATION_NONE || occ == OCCUPATION_DEPOT || occ == OCCUPATION_GOLD || OCCUPATION_ROBOT)
     {
         return 1;
     }
@@ -264,13 +286,62 @@ coords senseGoldCoords(int curX, int curY)
     return goldCoords;
 }
 
+int findIDFromCoords(int x, int y)
+{
+    int i;
+
+    for ( i = 0; i < totalRobotNum; i++)
+    {
+        if(robots[i].x == x && robots[i].y == y)
+            return i;
+    }
+    return -1;  // error
+    
+}
+
+int senseBetterCarrier(int curX, int curY, int id)
+{
+    int x, y;
+    int idOtherRobot;
+
+    for ( x = -1; x < 2; x++)
+    {
+        for ( y = -1; y < 2; y++)
+        {
+            if(x == 0 && y == 0)
+                break;
+
+            if(validCoordForPass(curX + x, curY + y) == 1)
+            {
+                if(getOccupation(curX+x,curY+y) == OCCUPATION_ROBOT)    // there is a robot near
+                {
+                    if(getIsRobotCarryGold(curX+x,curY+y) == 0) // it does not carry a gold
+                    {
+                        if(getSignalStr(curX, curY) > getSignalStr(curX+x,curY+y)) // it is closer to depot
+                        {
+                            idOtherRobot = findIDFromCoords(curX+x,curY+y);
+                            robots[id].isCarryGold = 0;
+                            setIsRobotCarryGold(curX, curY, 0);
+                            robots[idOtherRobot].isCarryGold = 1;
+                            setIsRobotCarryGold(curX + x, curY + y, 1);
+                            printf("Passing gold from: %d, to: %d \n",id,idOtherRobot);
+                            return 1;
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    return 0;
+}
+
 void act(int id)
 {
     int currX, currY, currOcc, isCarryGold;
     coords validCoords;
     coords goldCoords;
 
-    printf("id : %d \n",id);
     currX = robots[id].x;
     currY = robots[id].y;
     currOcc = getOccupation(currX, currY);
@@ -279,6 +350,10 @@ void act(int id)
     if(isCarryGold == 1 && currOcc == OCCUPATION_DEPOT) // Drop Gold
     {
         putDownGold(currX, currY, id);
+    }
+    else if(isCarryGold == 1 && senseBetterCarrier(currX, currY, id))
+    {
+        // Done in senseBetterCarrier
     }
     else if(isCarryGold == 1)   // Follow Gradient to Depot
     {
