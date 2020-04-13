@@ -20,10 +20,11 @@ void env_createGridWorld(int n)
     {
         for(j = 0; j < n; j++)
         {
-            globalMap[i][j].occupation = 0;
-            globalMap[i][j].h = 0;
+            globalMap[i][j].occupation = OCC_EMPTY;
+            globalMap[i][j].h = 1;
         }
     }
+    globalMap[n-1][n-1].h = 0;
 }
 
 void env_setOccupation(int x, int y, int occ)

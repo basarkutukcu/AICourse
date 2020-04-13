@@ -28,6 +28,7 @@ void inputReader()
         env_setOccupation(coordX, coordY, OCC_OBS);
     }
     
+    agn_spawnAgents(envParams.numOfAgents);
     agn_createLocalMap(envParams.mapSize, envParams.numOfAgents);
     env_setOccupation(0, 0, OCC_AGENT);
 
@@ -36,8 +37,17 @@ void inputReader()
 
 int main()
 {
-    int try;
+    int i,step;
     inputReader();
-    try = env_getOccupation(1,2);
-    printf("val is %d \n",try);
+
+    step = 0;
+    while(step < 500)
+    {
+        for(i=0;i<envParams.numOfAgents;i++)
+        {
+            agn_act(i);
+        }
+        step++;
+    }
+    
 }

@@ -14,5 +14,7 @@ typedef struct GridCells
 void env_setOccupation(int x, int y, int occ);
 void env_createGridWorld(int n);
 int env_getOccupation(int x, int y);
+void env_sethG(int x, int y, int val);
+int env_gethG(int x, int y);
 
 #endif
