@@ -2,6 +2,7 @@
 #include "agent.h"
 #include <stdlib.h>
 #include "stdio.h"
+#include "math.h"
 
 LocalGridCell*** localMap;
 
@@ -11,14 +12,19 @@ LocalGridCell*** localMap;
 // f[3] - Down
 int f[4];
 Agent* agents;
+int numOfAgents;
 int mapLen;
 int minIndex;
 int secondMinIndex;
+int minAvailables[4];
+int terminateSignal;
 
 void agn_spawnAgents(int n)
 {
     int i, j;
-    agents = (Agent*)malloc(n * sizeof(Agent*));
+    agents = (Agent*)malloc(n * sizeof(Agent));
+    numOfAgents = n;
+    terminateSignal = 0;
 
     for(i = 0; i < n; i++)
     {
@@ -82,10 +88,12 @@ void agn_setIsVisited(int a, int x, int y, int val)
 
 void agn_act(int a)
 {
+    int choice;
     agn_lookAheadSearch(a);
     agn_findMinF();
-    agn_estUpdate(a,agents[a].x,agents[a].y);
-    agn_move(a);
+    choice = agn_repulsiveChoice(a);
+    agn_estUpdate(a);
+    agn_move(a, choice);
 }
 
 void agn_lookAheadSearch(int a)
@@ -132,6 +140,51 @@ void agn_calculateF(int a, int x, int y, int findex)
     }
 }
 
+int agn_agentCoordX(int a, int c)
+{
+    if(c == 0)
+        return agents[a].x - 1;
+    else if(c == 1 || c == 3)
+        return agents[a].x;
+    else if(c == 2)
+        return agents[a].x + 1;
+}
+
+int agn_agentCoordY(int a, int c)
+{
+    if(c == 3)
+        return agents[a].y - 1;
+    else if(c == 0 || c == 2)
+        return agents[a].y;
+    else if(c == 1)
+        return agents[a].y + 1;
+}
+
+float agn_calculateAdj(int a, int c)
+{
+    int currX,currY,i,minAdjIndex;
+    float adj[200];
+    float min = 9999;
+    currX = agn_agentCoordX(a,c);
+    currY = agn_agentCoordY(a,c);
+
+    for ( i = 0; i < numOfAgents; i++)
+    {
+        if(i == a)
+        {
+            adj[i] = 99999;
+            continue;
+        }
+        adj[i] = sqrtf(powf((currX - agents[i].x),2) + powf((currY - agents[i].y),2));
+        if(adj[i] < min)
+        {
+            min = adj[i];
+            minAdjIndex = i;
+        }
+    }
+    return min;
+}
+
 
 int agn_isValid(int x, int y)
 {
@@ -144,12 +197,12 @@ int agn_isValid(int x, int y)
     return 1;
 }
 
-int agn_findMinF()
+void agn_findMinF()
 {
     int i;
     int min = FVAL_INF;
-    minIndex = 0;
-    secondMinIndex = 0;
+    minIndex = (rand() % 4);
+    secondMinIndex = minIndex;
 
     for(i = 0;i < 4; i++)
     {
@@ -159,31 +212,70 @@ int agn_findMinF()
             minIndex = i;
             secondMinIndex = minIndex;
         }
+        minAvailables[i] = 0;
     }
+    for ( i = 0; i < 4; i++)
+    {
+        if(f[i] == min)
+            minAvailables[i] = 1;
+    }
+    
 }
 
-int agn_move(int a)
+int agn_repulsiveChoice(int a)
+{
+    int i;
+    float adjVal;
+    float maxAdj = 0;
+    int maxAdjIndex;
+    float alpha = 1.5;
+    float rVal = (float) (alpha * localMap[a][agents[a].x][agents[a].y].h);
+    for ( i = 0; i < 4; i++)
+    {
+        if(minAvailables[i] == 1)
+        {
+            adjVal = agn_calculateAdj(a,i);
+            if(adjVal > rVal)
+            {
+                return i;
+            }
+            else
+            {
+                if(adjVal > maxAdj)
+                {
+                    maxAdj = adjVal;
+                    maxAdjIndex = i;
+                }
+            }
+            
+        }
+    }
+    return maxAdjIndex;    
+}
+
+void agn_move(int a, int c)
 {
     printf("Agent%d: ",a);
-    if(minIndex == 0)
+    localMap[a][agents[a].x][agents[a].y].isVisited = 1;
+    if(c == 0)
     {
         agents[a].x = agents[a].x - 1;
         agents[a].y = agents[a].y;
         printf("L");
     }
-    else if (minIndex == 1)
+    else if (c == 1)
     {
         agents[a].x = agents[a].x;
         agents[a].y = agents[a].y + 1;
         printf("U");
     }
-    else if (minIndex == 2)
+    else if (c == 2)
     {
         agents[a].x = agents[a].x + 1;
         agents[a].y = agents[a].y;
         printf("R");
     }
-    else if (minIndex == 3)
+    else if (c == 3)
     {
         agents[a].x = agents[a].x;
         agents[a].y = agents[a].y - 1;
@@ -191,18 +283,25 @@ int agn_move(int a)
     }
     else
     {
-        printf("Wrong Min Index \n\n");
+        printf("Wrong c Index \n\n");
     }
-    printf("    (%d,%d)\n",agents[a].x,agents[a].y);
+    printf("    (%d,%d)\n",agents[a].x+1,agents[a].y+1);
     if(agents[a].x == mapLen-1 && agents[a].y == mapLen-1)
     {
-        printf("Agent%d reached the goal\n\n",a);
-        exit(1);
+        printf("Agent%d reached the goal ",a);
+       terminateSignal = 1;
     }
 }
 
-void agn_estUpdate(int a, int x, int y)
+int agn_getTermSig()
 {
+    return terminateSignal;
+}
+
+void agn_estUpdate(int a)
+{
+    int x = agents[a].x;
+    int y = agents[a].y;
     env_sethG(x, y, f[minIndex]);
     localMap[a][x][y].h = f[secondMinIndex];
 }

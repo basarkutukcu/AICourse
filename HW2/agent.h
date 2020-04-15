@@ -27,8 +27,10 @@ int agn_getIsVisited(int a, int x, int y);
 void agn_setIsVisited(int a, int x, int y, int val);
 void agn_calculateF(int a, int x, int y, int findex);
 int agn_isValid(int x, int y);
-int agn_findMinF();
-int agn_move(int a);
-void agn_estUpdate(int a, int x, int y);
+void agn_findMinF();
+void agn_move(int a, int c);
+void agn_estUpdate(int a);
+int agn_repulsiveChoice(int a);
+int agn_getTermSig();
 
 #endif

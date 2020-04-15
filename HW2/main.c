@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include "stdio.h"
 #include "math.h"
+#include <time.h>
 
 static struct
 {
@@ -35,12 +36,16 @@ void inputReader()
     fclose(fp);
 }
 
+clock_t start, end;
+double cpu_time_used;
+
 int main()
 {
     int i,step;
     inputReader();
 
     step = 0;
+    start = clock();
     while(step < 500)
     {
         for(i=0;i<envParams.numOfAgents;i++)
@@ -48,6 +53,13 @@ int main()
             agn_act(i);
         }
         step++;
+        if(agn_getTermSig() == 1)
+        {
+            end = clock();
+            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+            printf("in %f seconds\n\n",cpu_time_used);
+            exit(1);
+        }
     }
     
 }
