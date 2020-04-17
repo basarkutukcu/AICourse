@@ -46,20 +46,21 @@ int main()
 
     step = 0;
     start = clock();
-    while(step < 500)
+    while(step < 50000)
     {
         for(i=0;i<envParams.numOfAgents;i++)
         {
             agn_act(i);
+            if(agn_getTermSig() == 1)
+            {
+                end = clock();
+                cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
+                printf("in %f seconds\n\n",cpu_time_used);
+                exit(1);
+            }
         }
         step++;
-        if(agn_getTermSig() == 1)
-        {
-            end = clock();
-            cpu_time_used = ((double) (end - start)) / CLOCKS_PER_SEC;
-            printf("in %f seconds\n\n",cpu_time_used);
-            exit(1);
-        }
+        
     }
     
 }

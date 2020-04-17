@@ -226,8 +226,8 @@ int agn_repulsiveChoice(int a)
 {
     int i;
     float adjVal;
-    float maxAdj = 0;
-    int maxAdjIndex;
+    float maxAdj = -1;
+    int maxAdjIndex = 0;
     float alpha = 1.5;
     float rVal = (float) (alpha * localMap[a][agents[a].x][agents[a].y].h);
     for ( i = 0; i < 4; i++)
@@ -241,13 +241,13 @@ int agn_repulsiveChoice(int a)
             }
             else
             {
+                //printf("ch : %d - adjVal %f\n",i,adjVal);
                 if(adjVal > maxAdj)
                 {
                     maxAdj = adjVal;
                     maxAdjIndex = i;
                 }
-            }
-            
+            }   
         }
     }
     return maxAdjIndex;    
